@@ -1,0 +1,14 @@
+inherited FrmPrincipal: TFrmPrincipal
+  Caption = 'FrmPrincipal'
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited PnlUpper: TPanel
+    ExplicitWidth = 561
+  end
+  inherited PnlMain: TPanel
+    ExplicitLeft = 0
+    ExplicitTop = 21
+    ExplicitWidth = 561
+    ExplicitHeight = 367
+  end
+end

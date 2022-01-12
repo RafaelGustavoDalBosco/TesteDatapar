@@ -1,0 +1,147 @@
+unit Frm.SendWhats;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Mask, App.Utils,
+  App.Simulator.Objects;
+
+type
+
+   TFrmSendWhats = class(TForm)
+      PnlMain: TPanel;
+      EdtNumero: TMaskEdit;
+      CbTypeSendCountry: TComboBox;
+      BtSendWhats: TButton;
+    Label1: TLabel;
+      procedure BtSendWhatsClick(Sender: TObject);
+      procedure CbTypeSendCountryChange(Sender: TObject);
+   private
+      FTypeSendWhatsCountry: TSendWhatsCountry;
+      FNumero: UnicodeString;
+      FFinanciamento: TFinanciamento;
+      procedure SetTypeSendWhatsCountry(const Value: TSendWhatsCountry);
+      procedure SetNumero(const Value: UnicodeString);
+      procedure SetFinanciamento(const Value: TFinanciamento);
+
+      function GetTypeSendWhatsCountry: TSendWhatsCountry;
+      function GetNumero: UnicodeString;
+   protected
+      /// <summary>
+      ///    Carrega os tipos de envido baseados nos paises no whats
+      /// </summary>
+      procedure LoadTypesComboBox;
+
+      /// <summary>
+      ///    Envia a simulação via whats
+      /// </summary>
+      procedure SendWhats;
+
+      /// <summary>
+      ///    Monta o texto a ser enviado
+      /// </summary>
+      function BuildTextToSend: UnicodeString;
+   public
+      property TypeSendWhatsCountry: TSendWhatsCountry read GetTypeSendWhatsCountry write SetTypeSendWhatsCountry;
+      property Numero: UnicodeString read GetNumero write SetNumero;
+      property Financiamento: TFinanciamento read FFinanciamento write SetFinanciamento;
+   end;
+
+var
+  FrmSendWhats: TFrmSendWhats;
+
+implementation
+
+{$R *.dfm}
+
+{ TFrmSendWhats }
+
+procedure TFrmSendWhats.BtSendWhatsClick(Sender: TObject);
+begin
+   SendWhats;
+end;
+
+function TFrmSendWhats.BuildTextToSend: UnicodeString;
+var
+   Loop: TFinanciamentoParcela;
+   SL: TStringList;
+begin
+   if Assigned(FFinanciamento) then
+   begin
+      SL := TStringList.Create;
+      try
+         SL.Add(('Simulação de Sistema de Pagamento Único de Financiamento');
+         SL.Add('Total do capital: R$' + FormatFloat('#.##0.00', Financiamento.Capital));
+         SL.Add('Taxa de juros: ' + FormatFloat('#.00', Financiamento.TaxaJuros) + '%');
+         SL.Add('Total de juros: R$' + FormatFloat('#.##0.00', Financiamento.TotalJuros));
+         SL.Add('Quantidade de meses para pagar: ' + Financiamento.QuantidadeParcelas.ToString);
+         SL.Add('Montante total da simulação: R$' + FormatFloat('#.##0.00', Financiamento.Capital + Financiamento.TotalJuros));
+
+      finally
+         Result := SL.Text;
+         FreeAndNil(SL);
+      end;
+   end;
+end;
+
+procedure TFrmSendWhats.CbTypeSendCountryChange(Sender: TObject);
+begin
+   case TypeSendWhatsCountry of
+      tsBR: EdtNumero.EditMask := '!\(99\)00000-0000;1;';
+      tsPY: EdtNumero.EditMask := '!\(99\)000-000-000;1;';
+      tsNone: EdtNumero.EditMask := '';
+   end;
+end;
+
+function TFrmSendWhats.GetNumero: UnicodeString;
+begin
+   Result := EdtNumero.Text;
+end;
+
+function TFrmSendWhats.GetTypeSendWhatsCountry: TSendWhatsCountry;
+begin
+   if (CbTypeSendCountry.ItemIndex > -1) then
+      Result := TSendWhatsCountry(Integer(CbTypeSendCountry.Items.Objects[CbTypeSendCountry.ItemIndex]))
+   else
+      Result := tsNone;
+end;
+
+procedure TFrmSendWhats.LoadTypesComboBox;
+begin
+   CbTypeSendCountry.Items.BeginUpdate;
+   try
+      CbTypeSendCountry.Items.AddObject('BR', TObject(TSendWhatsCountry.tsBR));
+      CbTypeSendCountry.Items.AddObject('PY', TObject(TSendWhatsCountry.tsPY));
+   finally
+      CbTypeSendCountry.Items.EndUpdate;
+   end;
+end;
+
+procedure TFrmSendWhats.SendWhats;
+var
+   URL: UnicodeString;
+begin
+   if (TypeSendWhatsCountry <> tsNone) then
+   begin
+      URL := UtilsLink.GetLinkWhatsWithContent(Numero, BuildTextToSend, TypeSendWhatsCountry);
+      UtilsFile.OpenAnyFile(URL);
+   end;
+end;
+
+procedure TFrmSendWhats.SetFinanciamento(const Value: TFinanciamento);
+begin
+   FFinanciamento := Value;
+end;
+
+procedure TFrmSendWhats.SetNumero(const Value: UnicodeString);
+begin
+   FNumero := Value;
+end;
+
+procedure TFrmSendWhats.SetTypeSendWhatsCountry(const Value: TSendWhatsCountry);
+begin
+   FTypeSendWhatsCountry := Value;
+end;
+
+end.

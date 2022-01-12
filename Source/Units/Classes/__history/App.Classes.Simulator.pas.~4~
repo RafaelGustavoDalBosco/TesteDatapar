@@ -1,0 +1,24 @@
+﻿unit App.Classes.Simulator;
+
+interface
+
+uses
+   System.Generics.Collections, System.SysUtils;
+
+type
+
+   TAppSimulator = class
+   public
+      function Execute(const AParcelas: Integer; const ATotal, AJuros: Currency): Boolean;
+   end;
+
+implementation
+
+{ TAppSimulator }
+
+function TAppSimulator.Execute(const AParcelas: Integer; const ATotal, AJuros: Currency): Boolean;
+begin
+
+end;
+
+end.

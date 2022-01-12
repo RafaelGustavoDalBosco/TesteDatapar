@@ -1,0 +1,58 @@
+object FrmSendWhats: TFrmSendWhats
+  Left = 0
+  Top = 0
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsSingle
+  Caption = 'Enviar via Whats'
+  ClientHeight = 309
+  ClientWidth = 645
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  PixelsPerInch = 96
+  TextHeight = 13
+  object PnlMain: TPanel
+    Left = 0
+    Top = 0
+    Width = 645
+    Height = 309
+    Align = alClient
+    BevelOuter = bvNone
+    Color = clWhite
+    ParentBackground = False
+    TabOrder = 0
+    object EdtNumero: TMaskEdit
+      Left = 24
+      Top = 88
+      Width = 115
+      Height = 21
+      EditMask = '!\(99\)00000-0000;1;'
+      MaxLength = 14
+      TabOrder = 0
+      Text = '(  )     -    '
+    end
+    object CbTypeSendCountry: TComboBox
+      Left = 152
+      Top = 160
+      Width = 145
+      Height = 21
+      Style = csDropDownList
+      TabOrder = 1
+      Items.Strings = (
+        'BR'
+        'PY')
+    end
+    object BtSendWhats: TButton
+      Left = 192
+      Top = 104
+      Width = 75
+      Height = 25
+      Caption = 'Enviar Whats'
+      TabOrder = 2
+    end
+  end
+end

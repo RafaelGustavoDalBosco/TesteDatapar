@@ -1,0 +1,117 @@
+unit Frm.Principal;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Frm.Ancestral, Vcl.Buttons, Vcl.ExtCtrls,
+  Vcl.CategoryButtons, Vcl.WinXCtrls, Vcl.StdCtrls, Vcl.Imaging.pngimage,
+  dxGDIPlusClasses;
+
+type
+
+  TFrmPrincipal = class(TFrmAncestral)
+    ImgMain: TImage;
+    PnlToolBar: TPanel;
+    ImgMenu: TImage;
+    lblTitle: TLabel;
+    SplitView: TSplitView;
+    CategoryButtons: TCategoryButtons;
+      procedure Fechar1Click(Sender: TObject);
+      procedure ImgMenuClick(Sender: TObject);
+      procedure SplitViewClosed(Sender: TObject);
+      procedure SplitViewOpened(Sender: TObject);
+      procedure SplitViewOpening(Sender: TObject);
+      procedure FormClose(Sender: TObject; var Action: TCloseAction);
+      procedure CategoryButtonsCategories0Items0Click(Sender: TObject);
+      procedure CategoryButtonsCategories0Items1Click(Sender: TObject);
+      procedure CategoryButtonsCategories0Items2Click(Sender: TObject);
+   protected
+      /// <summary>
+      ///    Fecha todos os forms da aplicação (menos este)
+      /// </summary>
+      procedure CloseAllForms;
+   private
+      /// <summary>
+      ///    Seta o tamanho e o caption do CategoryButtons baseado no SplitView
+      /// </summary>
+      procedure SplitViewOpen;
+  end;
+
+var
+  FrmPrincipal: TFrmPrincipal;
+
+implementation
+
+{$R *.dfm}
+
+procedure TFrmPrincipal.CategoryButtonsCategories0Items0Click(Sender: TObject);
+begin
+   FrmSimulador := TFrmSimulador.Create(nil);
+   FrmSimulador.Show;
+end;
+
+procedure TFrmPrincipal.CategoryButtonsCategories0Items1Click(Sender: TObject);
+begin
+   CloseAllForms;
+end;
+
+procedure TFrmPrincipal.CategoryButtonsCategories0Items2Click(Sender: TObject);
+begin
+   Close;
+end;
+
+procedure TFrmPrincipal.CloseAllForms;
+var
+   Loop: Integer;
+begin
+   for Loop := 0 to Screen.FormCount - 1 do
+   begin
+      if (Screen.Forms[Loop] <> Self) then
+         Screen.Forms[Loop].Close;
+   end;
+end;
+
+procedure TFrmPrincipal.Fechar1Click(Sender: TObject);
+begin
+   Close;
+end;
+
+procedure TFrmPrincipal.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+   CloseAllForms;
+   inherited;
+end;
+
+procedure TFrmPrincipal.ImgMenuClick(Sender: TObject);
+begin
+   if SplitView.Opened then
+     SplitView.Close
+   else
+     SplitView.Open;
+end;
+
+procedure TFrmPrincipal.SplitViewClosed(Sender: TObject);
+begin
+   CategoryButtons.ButtonOptions := CategoryButtons.ButtonOptions - [boShowCaptions];
+   if (SplitView.CloseStyle = svcCompact) then
+      CategoryButtons.Width := SplitView.CompactWidth;
+end;
+
+procedure TFrmPrincipal.SplitViewOpen;
+begin
+   CategoryButtons.ButtonOptions := CategoryButtons.ButtonOptions + [boShowCaptions];
+   CategoryButtons.Width := SplitView.OpenedWidth;
+end;
+
+procedure TFrmPrincipal.SplitViewOpened(Sender: TObject);
+begin
+   SplitViewOpen;
+end;
+
+procedure TFrmPrincipal.SplitViewOpening(Sender: TObject);
+begin
+   SplitViewOpen;
+end;
+
+end.

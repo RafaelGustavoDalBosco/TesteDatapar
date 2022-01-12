@@ -1,0 +1,64 @@
+﻿unit App.Classes.Simulator;
+
+interface
+
+uses
+   System.Generics.Collections, System.SysUtils;
+
+type
+
+
+   TSimulatorMontante = class
+  private
+      FTaxaJuros: Currency;
+      FParcelas: Integer;
+      FCapital: Currency;
+      procedure SetCapital(const Value: Currency);
+      procedure SetParcelas(const Value: Integer);
+      procedure SetTaxaJuros(const Value: Currency);
+   public
+      property Capital: Currency read FCapital write SetCapital;
+      property TaxaJuros: Currency read FTaxaJuros write SetTaxaJuros;
+      property Parcelas: Integer read FParcelas write SetParcelas;
+   end;
+
+   TSimulatorParcela = class
+   public
+      property Juros: Currency;
+      property SaldoDevedor: Currency;
+      property Amortizacao: Currency;
+      property Pagamento: Currency;
+   end;
+
+   TAppSimulator = class
+   public
+      function Execute(const AParcelas: Integer; const ATotal, AJuros: Currency): Boolean;
+   end;
+
+implementation
+
+{ TAppSimulator }
+
+function TAppSimulator.Execute(const AParcelas: Integer; const ATotal, AJuros: Currency): Boolean;
+begin
+
+end;
+
+{ TSimulatorMontante }
+
+procedure TSimulatorMontante.SetCapital(const Value: Currency);
+begin
+   FCapital := Value;
+end;
+
+procedure TSimulatorMontante.SetParcelas(const Value: Integer);
+begin
+   FParcelas := Value;
+end;
+
+procedure TSimulatorMontante.SetTaxaJuros(const Value: Currency);
+begin
+   FTaxaJuros := Value;
+end;
+
+end.

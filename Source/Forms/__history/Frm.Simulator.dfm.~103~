@@ -1,0 +1,356 @@
+object FrmSimulador: TFrmSimulador
+  Left = 0
+  Top = 0
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  BorderWidth = 4
+  Caption = 'Simulador de Financiamento'
+  ClientHeight = 451
+  ClientWidth = 493
+  Color = 16744448
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  FormStyle = fsMDIChild
+  OldCreateOrder = False
+  Visible = True
+  OnClose = FormClose
+  PixelsPerInch = 96
+  TextHeight = 13
+  object PnlMain: TPanel
+    Left = 0
+    Top = 21
+    Width = 493
+    Height = 430
+    Align = alClient
+    BevelOuter = bvNone
+    Color = clWhite
+    ParentBackground = False
+    TabOrder = 0
+    ExplicitTop = 0
+    ExplicitWidth = 492
+    ExplicitHeight = 461
+    object GrbGrid: TGroupBox
+      Left = 5
+      Top = 50
+      Width = 485
+      Height = 334
+      Caption = 'Resultado da simula'#231#227'o'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Segoe UI Semibold'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 4
+      object GridSimulator: TDBGrid
+        Left = 2
+        Top = 17
+        Width = 481
+        Height = 315
+        Align = alClient
+        Options = [dgTitles, dgIndicator, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+        ReadOnly = True
+        TabOrder = 0
+        TitleFont.Charset = ANSI_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -12
+        TitleFont.Name = 'Segoe UI Semibold'
+        TitleFont.Style = [fsBold]
+        Columns = <
+          item
+            Alignment = taCenter
+            Expanded = False
+            FieldName = 'PARCELA'
+            Title.Caption = 'n'
+            Width = 60
+            Visible = True
+          end
+          item
+            Alignment = taCenter
+            Expanded = False
+            FieldName = 'JUROS'
+            Title.Caption = 'Juros'
+            Width = 90
+            Visible = True
+          end
+          item
+            Alignment = taCenter
+            Expanded = False
+            FieldName = 'AMORTIZACAO'
+            Title.Caption = 'Amortiza'#231#227'o'
+            Width = 90
+            Visible = True
+          end
+          item
+            Alignment = taCenter
+            Expanded = False
+            FieldName = 'PAGAMENTO'
+            Title.Caption = 'Pagamento'
+            Width = 100
+            Visible = True
+          end
+          item
+            Alignment = taCenter
+            Expanded = False
+            FieldName = 'SALDODEVEDOR'
+            Title.Caption = 'Saldo devedor'
+            Width = 100
+            Visible = True
+          end>
+      end
+    end
+    object GrbCapital: TGroupBox
+      Left = 5
+      Top = 3
+      Width = 118
+      Height = 48
+      Caption = 'Capital R$'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Segoe UI Semibold'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 0
+      object EdtCapital: TEdit
+        Left = 2
+        Top = 17
+        Width = 114
+        Height = 29
+        Align = alClient
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Segoe UI Semibold'
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 0
+        OnExit = EdtCapitalExit
+        OnKeyPress = EdtCapitalKeyPress
+        ExplicitHeight = 25
+      end
+    end
+    object GrbTaxaJuros: TGroupBox
+      Left = 129
+      Top = 3
+      Width = 90
+      Height = 48
+      Caption = 'Taxa Juros %'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Segoe UI Semibold'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 1
+      object EdtTaxaJuros: TEdit
+        Left = 2
+        Top = 17
+        Width = 86
+        Height = 29
+        Align = alClient
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Segoe UI Semibold'
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 0
+        OnExit = EdtTaxaJurosExit
+        OnKeyPress = EdtTaxaJurosKeyPress
+        ExplicitHeight = 25
+      end
+    end
+    object GrbMeses: TGroupBox
+      Left = 225
+      Top = 3
+      Width = 50
+      Height = 48
+      Caption = 'Meses'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Segoe UI Semibold'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 2
+      object EdtMeses: TEdit
+        Left = 2
+        Top = 17
+        Width = 46
+        Height = 29
+        Align = alClient
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Segoe UI Semibold'
+        Font.Style = [fsBold]
+        NumbersOnly = True
+        ParentFont = False
+        TabOrder = 0
+        OnExit = EdtTaxaJurosExit
+        OnKeyPress = EdtTaxaJurosKeyPress
+        ExplicitHeight = 25
+      end
+    end
+    object BtSimular: TButton
+      Left = 279
+      Top = 9
+      Width = 211
+      Height = 40
+      Caption = 'Simular'
+      DoubleBuffered = False
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Segoe UI Semibold'
+      Font.Style = [fsBold]
+      ImageIndex = 3
+      ParentDoubleBuffered = False
+      ParentFont = False
+      TabOrder = 3
+      OnClick = BtSimularClick
+    end
+    object BtFechar: TButton
+      Left = 7
+      Top = 388
+      Width = 483
+      Height = 40
+      Caption = 'Fechar'
+      DoubleBuffered = False
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Segoe UI Semibold'
+      Font.Style = [fsBold]
+      ImageIndex = 3
+      ParentDoubleBuffered = False
+      ParentFont = False
+      TabOrder = 5
+      OnClick = BtSimularClick
+    end
+  end
+  object PnlUpper: TPanel
+    Left = 0
+    Top = 0
+    Width = 493
+    Height = 21
+    Align = alTop
+    Alignment = taLeftJustify
+    BevelOuter = bvNone
+    Caption = 'Form Caption'
+    Color = 16744448
+    Ctl3D = False
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWhite
+    Font.Height = -11
+    Font.Name = 'Segoe UI Semibold'
+    Font.Style = [fsBold]
+    ParentBackground = False
+    ParentCtl3D = False
+    ParentFont = False
+    TabOrder = 1
+    OnMouseDown = PnlUpperMouseDown
+    ExplicitLeft = -233
+    ExplicitWidth = 715
+    object BtClose: TSpeedButton
+      Left = 470
+      Top = 0
+      Width = 23
+      Height = 21
+      Align = alRight
+      AllowAllUp = True
+      Flat = True
+      Glyph.Data = {
+        36040000424D3604000000000000360000002800000010000000100000000100
+        2000000000000004000000000000000000000000000000000000000000002525
+        25473A3A3A700000000000000000000000000000000000000000000000000000
+        00000000000000000000000000003D3D3D752525254700000000252525477F7F
+        7FF6848484FF3C3C3C7300000000000000000000000000000000000000000000
+        000000000000000000003E3E3E77848484FF808080F7252525474040407B8484
+        84FF848484FF848484FF3C3C3C73000000000000000000000000000000000000
+        0000000000003E3E3E77848484FF848484FF848484FF3F3F3F7A000000004242
+        427F848484FF848484FF848484FF3C3C3C730000000000000000000000000000
+        00003E3E3E77848484FF848484FF848484FF4141417E00000000000000000000
+        00004242427F848484FF848484FF848484FF3C3C3C7300000000000000003E3E
+        3E77848484FF848484FF848484FF4141417E0000000000000000000000000000
+        0000000000004242427F848484FF848484FF848484FF3C3C3C733E3E3E778484
+        84FF848484FF848484FF4141417E000000000000000000000000000000000000
+        000000000000000000004242427F848484FF848484FF848484FF848484FF8484
+        84FF848484FF4141417E00000000000000000000000000000000000000000000
+        00000000000000000000000000004242427F848484FF848484FF848484FF8484
+        84FF4141417E0000000000000000000000000000000000000000000000000000
+        00000000000000000000000000003E3E3E77848484FF848484FF848484FF8484
+        84FF3C3C3C740000000000000000000000000000000000000000000000000000
+        000000000000000000003E3E3E77848484FF848484FF848484FF848484FF8484
+        84FF848484FF3C3C3C7400000000000000000000000000000000000000000000
+        0000000000003E3E3E77848484FF848484FF848484FF4141417E4242427F8484
+        84FF848484FF848484FF3C3C3C74000000000000000000000000000000000000
+        00003E3E3E77848484FF848484FF848484FF4141417D00000000000000004242
+        427F848484FF848484FF848484FF3C3C3C740000000000000000000000003E3E
+        3E77848484FF848484FF848484FF4141417D0000000000000000000000000000
+        00004242427F848484FF848484FF848484FF3C3C3C74000000003D3D3D758484
+        84FF848484FF848484FF4141417D000000000000000000000000000000000000
+        0000000000004242427F848484FF848484FF848484FF3B3B3B722828284D8181
+        81F9848484FF4141417D00000000000000000000000000000000000000000000
+        000000000000000000004242427F848484FF818181F92828284E000000002828
+        284D3F3F3F7A0000000000000000000000000000000000000000000000000000
+        00000000000000000000000000004040407B2828284D00000000}
+      OnClick = BtCloseClick
+      ExplicitLeft = 556
+      ExplicitTop = -1
+      ExplicitHeight = 22
+    end
+    object BtMinimize: TSpeedButton
+      Left = 447
+      Top = 0
+      Width = 23
+      Height = 21
+      Align = alRight
+      AllowAllUp = True
+      Flat = True
+      Glyph.Data = {
+        36040000424D3604000000000000360000002800000010000000100000000100
+        2000000000000004000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000004463
+        D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463
+        D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF00000000000000004463
+        D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463
+        D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF00000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000}
+      OnClick = BtMinimizeClick
+      ExplicitLeft = 556
+      ExplicitTop = -1
+      ExplicitHeight = 22
+    end
+  end
+end

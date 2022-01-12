@@ -1,0 +1,34 @@
+unit Frm.Financiamento;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Frm.Ancestral, Vcl.Buttons, Vcl.ExtCtrls,
+  Data.DB, Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls;
+
+type
+  TFrmFinanciamento = class(TFrmAncestral)
+    BtSimular: TButton;
+    GrbCapital: TGroupBox;
+    EdtCapital: TEdit;
+    GrbGrid: TGroupBox;
+    GridSimulator: TDBGrid;
+    GrbMeses: TGroupBox;
+    EdtMeses: TEdit;
+    GrbTaxaJuros: TGroupBox;
+    EdtTaxaJuros: TEdit;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FrmFinanciamento: TFrmFinanciamento;
+
+implementation
+
+{$R *.dfm}
+
+end.

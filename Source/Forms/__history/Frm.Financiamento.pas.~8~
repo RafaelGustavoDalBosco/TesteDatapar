@@ -1,0 +1,348 @@
+unit Frm.Financiamento;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Frm.Ancestral, Vcl.Buttons, Vcl.ExtCtrls,
+  Data.DB, Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls, DataSnap.DBClient,
+  App.Financiamento.Objects, App.Utils;
+
+type
+  TFrmFinanciamento = class(TForm)
+      GrbGrid: TGroupBox;
+      GrbCapital: TGroupBox;
+      GrbTaxaJuros: TGroupBox;
+      GrbMeses: TGroupBox;
+      BtSimular: TButton;
+      GridSimulator: TDBGrid;
+      EdtCapital: TEdit;
+      EdtTaxaJuros: TEdit;
+      EdtMeses: TEdit;
+      procedure EdtCapitalKeyPress(Sender: TObject; var Key: Char);
+      procedure EdtTaxaJurosKeyPress(Sender: TObject; var Key: Char);
+      procedure FormClose(Sender: TObject; var Action: TCloseAction);
+      procedure BtSimularClick(Sender: TObject);
+      procedure BtCloseClick(Sender: TObject);
+      procedure EdtCapitalExit(Sender: TObject);
+      procedure EdtTaxaJurosExit(Sender: TObject);
+   private
+      FMeses: Integer;
+      FTaxaJuros: Currency;
+      FCapital: Currency;
+      FClientDataSet: TClientDataSet;
+      FDataSource: TDataSource;
+      procedure SetCapital(const Value: Currency);
+      procedure SetMeses(const Value: Integer);
+      procedure SetTaxaJuros(const Value: Currency);
+      procedure SetClientDataSet(const Value: TClientDataSet);
+      procedure SetDataSource(const Value: TDataSource);
+
+      function GetCapital: Currency;
+      function GetTaxaJuros: Currency;
+      function GetMeses: Integer;
+      function GetClientDataSet: TClientDataSet;
+      function GetDataSource: TDataSource;
+   protected
+      /// <summary>
+      ///    Cria e seta o CDS/DS ao Grid
+      /// </summary>
+      procedure CreateAndSetSourceOnGrid;
+
+      /// <summary>
+      ///    Limpa o CDS/DS do Grid
+      /// </summary>
+      procedure ClearForm;
+   strict protected
+      /// <summary>
+      ///    Valida as informações digitadas nos campos do form
+      /// </summary>
+      function Validate: Boolean;
+
+      /// <summary>
+      ///    Executa a simulação
+      /// </summary>
+      procedure Simulate;
+   strict private
+      /// <summary>
+      ///    Insere os dados do financiamento ao DBGrid
+      /// </summary>
+      procedure AppendDataOnClientDataSet(const AFinanciamento: TFinanciamento);
+
+      /// <summary>
+      ///    Insere a primeira linha no grid
+      /// </summary>
+      procedure InsertFirstLine(const ACapital: Currency);
+
+      /// <summary>
+      ///    Insere a última linha no grid
+      /// </summary>
+      procedure InsertLastLine(const AFinanciamento: TFinanciamento);
+
+      /// <summary>
+      ///    Insere uma linha no grid com os dados da parcela
+      /// </summary>
+      procedure AppendLineOnClientDataSet(const AFinanciamentoParcela: TFinanciamentoParcela);
+   public
+      property Capital: Currency read GetCapital write SetCapital;
+      property TaxaJuros: Currency read GetTaxaJuros write SetTaxaJuros;
+      property Meses: Integer read GetMeses write SetMeses;
+      property ClientDataSet: TClientDataSet read GetClientDataSet write SetClientDataSet;
+      property DataSource: TDataSource read GetDataSource write SetDataSource;
+
+      procedure CreateParams(var Params: TCreateParams); override;
+   end;
+
+var
+  FrmSimulador: TFrmFinanciamento;
+
+implementation
+
+{$R *.dfm}
+
+procedure TFrmFinanciamento.AppendDataOnClientDataSet(const AFinanciamento: TFinanciamento);
+var
+   FinanciamentoParcela: TFinanciamentoParcela;
+begin
+   if Assigned(AFinanciamento) then
+   begin
+      CreateAndSetSourceOnGrid;
+
+      // -> Insere a primeira linha
+      InsertFirstLine(AFinanciamento.Capital);
+
+      // -> Insere as parcelas
+      for FinanciamentoParcela in AFinanciamento.Parcelas do
+         AppendLineOnClientDataSet(FinanciamentoParcela);
+
+      // -> Insere a última linha
+      InsertLastLine(AFinanciamento);
+   end;
+end;
+
+procedure TFrmFinanciamento.AppendLineOnClientDataSet(const AFinanciamentoParcela: TFinanciamentoParcela);
+begin
+   ClientDataSet.Append;
+   ClientDataSet.FieldByName('PARCELA').AsString := AFinanciamentoParcela.Parcela.ToString;
+   ClientDataSet.FieldByName('JUROS').AsCurrency := AFinanciamentoParcela.Juros;
+
+   if (AFinanciamentoParcela.Amortizacao > 0) then
+      ClientDataSet.FieldByName('AMORTIZACAO').AsCurrency := AFinanciamentoParcela.Amortizacao
+   else
+      ClientDataSet.FieldByName('AMORTIZACAO').AsString := '';
+
+   if (AFinanciamentoParcela.Pagamento > 0) then
+      ClientDataSet.FieldByName('PAGAMENTO').AsCurrency := AFinanciamentoParcela.Pagamento
+   else
+      ClientDataSet.FieldByName('PAGAMENTO').AsString := '';
+
+   ClientDataSet.FieldByName('SALDODEVEDOR').AsCurrency := AFinanciamentoParcela.SaldoDevedor;
+   ClientDataSet.Post;
+end;
+
+procedure TFrmFinanciamento.BtCloseClick(Sender: TObject);
+begin
+   Close;
+end;
+
+procedure TFrmFinanciamento.BtSimularClick(Sender: TObject);
+begin
+   Simulate;
+end;
+
+procedure TFrmFinanciamento.ClearForm;
+begin
+   if Assigned(FClientDataSet) then
+   begin
+      FClientDataSet.EmptyDataSet;
+      FreeAndNil(FClientDataSet);
+   end;
+
+   if Assigned(FDataSource) then
+      FreeAndNil(FDataSource);
+end;
+
+procedure TFrmFinanciamento.CreateAndSetSourceOnGrid;
+begin
+   if (GridSimulator.DataSource = nil) then
+   begin
+      ClientDataSet.Close;
+      ClientDataSet.FieldDefs.Add('PARCELA', ftString, 6);
+      ClientDataSet.FieldDefs.Add('JUROS', ftCurrency);
+      ClientDataSet.FieldDefs.Add('AMORTIZACAO', ftCurrency);
+      ClientDataSet.FieldDefs.Add('PAGAMENTO', ftCurrency);
+      ClientDataSet.FieldDefs.Add('SALDODEVEDOR', ftCurrency);
+      ClientDataSet.CreateDataSet;
+
+      DataSource.DataSet := ClientDataSet;
+      GridSimulator.DataSource := DataSource;
+   end
+   else
+   if (ClientDataSet.Active) then
+      ClientDataSet.EmptyDataSet;
+end;
+
+procedure TFrmFinanciamento.CreateParams(var Params: TCreateParams);
+begin
+   inherited;
+   Params.Style := Params.Style - WS_BORDER;
+end;
+
+procedure TFrmFinanciamento.EdtCapitalExit(Sender: TObject);
+begin
+   if (Capital > 0.00) then
+      EdtCapital.Text := FormatFloat('#,###,##0.00', Capital);
+end;
+
+procedure TFrmFinanciamento.EdtCapitalKeyPress(Sender: TObject; var Key: Char);
+begin
+   UtilsComp.KeyPressCurrency(Key);
+end;
+
+procedure TFrmFinanciamento.EdtTaxaJurosExit(Sender: TObject);
+begin
+   if (TaxaJuros > 0.00) then
+      EdtTaxaJuros.Text := FormatFloat('#0.00', TaxaJuros);
+end;
+
+procedure TFrmFinanciamento.EdtTaxaJurosKeyPress(Sender: TObject; var Key: Char);
+begin
+   UtilsComp.KeyPressCurrency(Key);
+end;
+
+procedure TFrmFinanciamento.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+   ClearForm;
+   Action := caFree;
+   Release;
+   FrmFinanciamento := nil;
+end;
+
+function TFrmFinanciamento.GetCapital: Currency;
+begin
+   Result := UtilsConv.TryStrToCurrency(EdtCapital.Text);
+end;
+
+function TFrmFinanciamento.GetClientDataSet: TClientDataSet;
+begin
+   if (not Assigned(FClientDataSet)) then
+      FClientDataSet := TClientDataSet.Create(nil);
+
+   Result := FClientDataSet;
+end;
+
+function TFrmFinanciamento.GetDataSource: TDataSource;
+begin
+   if (not Assigned(FDataSource)) then
+      FDataSource := TDataSource.Create(nil);
+
+   Result := FDataSource;
+end;
+
+function TFrmFinanciamento.GetMeses: Integer;
+begin
+   Result := UtilsConv.TryStrToInteger(EdtMeses.Text);
+end;
+
+function TFrmFinanciamento.GetTaxaJuros: Currency;
+begin
+   Result := UtilsConv.TryStrToCurrency(EdtTaxaJuros.Text);
+end;
+
+procedure TFrmFinanciamento.InsertFirstLine(const ACapital: Currency);
+begin
+   ClientDataSet.Append;
+   ClientDataSet.FieldByName('PARCELA').AsString := '0';
+   ClientDataSet.FieldByName('JUROS').AsCurrency := 0;
+   ClientDataSet.FieldByName('AMORTIZACAO').AsCurrency := 0;
+   ClientDataSet.FieldByName('PAGAMENTO').AsCurrency := 0;
+   ClientDataSet.FieldByName('SALDODEVEDOR').AsCurrency := ACapital;
+   ClientDataSet.Post;
+end;
+
+procedure TFrmFinanciamento.InsertLastLine(const AFinanciamento: TFinanciamento);
+begin
+   ClientDataSet.Append;
+   ClientDataSet.FieldByName('PARCELA').AsString := 'Totais';
+   ClientDataSet.FieldByName('JUROS').AsCurrency := AFinanciamento.TotalJuros;
+   ClientDataSet.FieldByName('AMORTIZACAO').AsCurrency := AFinanciamento.Capital;
+   ClientDataSet.FieldByName('PAGAMENTO').AsCurrency := AFinanciamento.Capital + AFinanciamento.TotalJuros;
+   ClientDataSet.Post;
+end;
+
+procedure TFrmFinanciamento.SetCapital(const Value: Currency);
+begin
+   FCapital := Value;
+end;
+
+procedure TFrmFinanciamento.SetClientDataSet(const Value: TClientDataSet);
+begin
+  FClientDataSet := Value;
+end;
+
+procedure TFrmFinanciamento.SetDataSource(const Value: TDataSource);
+begin
+   FDataSource := Value;
+end;
+
+procedure TFrmFinanciamento.SetMeses(const Value: Integer);
+begin
+   FMeses := Value;
+end;
+
+procedure TFrmFinanciamento.SetTaxaJuros(const Value: Currency);
+begin
+   FTaxaJuros := Value;
+end;
+
+procedure TFrmFinanciamento.Simulate;
+var
+   Simulator: TAppSimulatorController;
+   Financiamento: TFinanciamento;
+begin
+   if Validate then
+   begin
+      Simulator := TAppSimulatorController.Create(Capital, TaxaJuros, Meses);
+      try
+         // -> Obtém o objeto com a simulação do financiamento
+         Financiamento := Simulator.Execute;
+
+         if Assigned(Financiamento) then
+         begin
+            AppendDataOnClientDataSet(Financiamento);
+            FreeAndNil(Financiamento);
+         end;
+      finally
+         FreeAndNil(Simulator);
+      end;
+   end;
+end;
+
+function TFrmFinanciamento.Validate: Boolean;
+begin
+   if (Capital <= 0) then
+   begin
+      UtilsMsg.ShowMessageInformation('Obrigatório informar o valor de capital!');
+      UtilsComp.FocusIndicator(EdtCapital);
+      Exit(False);
+   end;
+
+   if (TaxaJuros <= 0) then
+   begin
+      UtilsMsg.ShowMessageInformation('Obrigatório informar a taxa de juros!');
+      UtilsComp.FocusIndicator(EdtTaxaJuros);
+      Exit(False);
+   end;
+
+   if (Meses <= 0) then
+   begin
+      UtilsMsg.ShowMessageInformation('Obrigatório informar a quantidade de meses!');
+      UtilsComp.FocusIndicator(EdtMeses);
+      Exit(False);
+   end;
+
+   Result := True;
+end;
+
+
+end.

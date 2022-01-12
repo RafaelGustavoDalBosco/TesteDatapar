@@ -1,0 +1,23 @@
+﻿program DataPar;
+
+uses
+  Vcl.Forms,
+  Frm.Main in '..\Source\Forms\Frm.Main.pas' {FrmMain},
+  Frm.Simulator in '..\Source\Forms\Frm.Simulator.pas' {FrmSimulator},
+  App.Utils in '..\Source\Units\Utils\App.Utils.pas',
+  App.Utils.Component.Border in '..\Source\Units\Utils\App.Utils.Component.Border.pas',
+  App.Simulator.Objects in '..\Source\Units\Classes\App.Simulator.Objects.pas',
+  App.Simulator.Controller in '..\Source\Units\Classes\App.Simulator.Controller.pas',
+  Frm.SendWhats in '..\Source\Forms\Frm.SendWhats.pas' {FrmSendWhats};
+
+{$R *.res}
+
+begin
+   ReportMemoryLeaksOnShutdown := True;
+
+   Application.Initialize;
+   Application.MainFormOnTaskbar := True;
+   Application.CreateForm(TFrmMain, FrmMain);
+  Application.CreateForm(TFrmSendWhats, FrmSendWhats);
+  Application.Run;
+end.

@@ -1,0 +1,14 @@
+inherited FrmFinanciamento: TFrmFinanciamento
+  Caption = 'FrmFinanciamento'
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited PnlMain: TPanel
+    ExplicitLeft = 0
+    ExplicitTop = 0
+    ExplicitWidth = 647
+    ExplicitHeight = 334
+    inherited PnlUpper: TPanel
+      ExplicitTop = 0
+    end
+  end
+end
